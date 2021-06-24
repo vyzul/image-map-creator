@@ -15,7 +15,6 @@ import * as ContextMenu from "../lib/contextmenu/contextmenu";
 import "../lib/contextmenu/contextmenu.css";
 //@ts-ignore strange way to import but it's working
 import p5 = require("p5");
-import { reaction, observable, makeAutoObservable } from "mobx";
 
 export type Tool = "polygon" | "rectangle" | "circle" | "select" | "delete" | "test";
 export type Image = {
@@ -48,7 +47,7 @@ export class imageMapCreator {
 	protected callBacks: Callbacks
 	protected menu = {
 		SetUrl: {
-			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.setAreaUrl(area)},
+			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.setAreaUrl(area, '')},
 			label: "Set url",
 		},
 		SetTitle: {
