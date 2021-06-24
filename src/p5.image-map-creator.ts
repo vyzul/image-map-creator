@@ -15,6 +15,7 @@ import * as ContextMenu from "../lib/contextmenu/contextmenu";
 import "../lib/contextmenu/contextmenu.css";
 //@ts-ignore strange way to import but it's working
 import p5 = require("p5");
+import { reaction, observable, makeAutoObservable } from "mobx";
 
 export type Tool = "polygon" | "rectangle" | "circle" | "select" | "delete" | "test";
 export type Image = {
@@ -27,6 +28,10 @@ export type ToolLabel = {
 };
 export type View = { scale: number, transX: number, transY: number, };
 export type Zoom = { min: number, max: number, sensativity: number, };
+interface Callbacks  {
+	onUpdatedAreas: ()=> void;
+	onAddArea: (area: Area)=> void;
+}
 
 export class Save {
 	constructor (public version: string, public map: ImageMap) {}
@@ -37,26 +42,27 @@ export class Save {
 export class imageMapCreator {
 	protected width: number;
 	protected height: number;
-	protected tool: Tool;
+	public tool: Tool;
 	protected drawingTools: Tool[];
 	protected settings: any;
+	protected callBacks: Callbacks
 	protected menu = {
 		SetUrl: {
-			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.setAreaUrl(area); },
+			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.setAreaUrl(area)},
 			label: "Set url",
 		},
 		SetTitle: {
-			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.setAreaTitle(area); },
+			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.setAreaTitle(area, '')},
 			label: "Set title",
 		},
-		Delete: (target: Element, key: any, item: HTMLElement, area: Area) => { this.deleteArea(area); },
+		Delete: (target: Element, key: any, item: HTMLElement, area: Area) => { this.deleteArea(area) },
 		MoveFront: {
-			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.moveArea(area, -1); },
+			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.moveArea(area, -1)},
 			enabled: true,
 			label: "Move Forward",
 		},
 		MoveBack: {
-			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.moveArea(area, 1); },
+			onSelect: (target: Element, key: any, item: HTMLElement, area: Area) => { this.moveArea(area, 1)},
 			enabled: true,
 			label: "Move Backward",
 		}
@@ -65,6 +71,7 @@ export class imageMapCreator {
 	protected selection: Selection;
 	protected hoveredArea: Area|null;
 	protected hoveredPoint: Coord|null;
+	// @ts-ignore
 	public map: ImageMap;
 	protected undoManager: any;
 	protected img: Image;
@@ -82,7 +89,8 @@ export class imageMapCreator {
 	 * @param {number} width
 	 * @param {number} height
 	 */
-	constructor(elementId: string, width: number = 600, height: number = 450) {
+	constructor(elementId: string, width: number = 600, height: number = 450, callBacks: Callbacks) {
+		this.callBacks = callBacks
 		const element = document.getElementById(elementId);
 		if (!element) throw new Error('HTMLElement not found');
 		this.width = width;
@@ -154,12 +162,18 @@ export class imageMapCreator {
 			.addButton("Generate Svg", () => { this.settings.setValue("Output", this.map.toSvg()) })
 			.addTextArea("Output")
 			.addButton("Save", this.save.bind(this));
+
+			
 		//@ts-ignore Fix for oncontextmenu
 		this.p5.canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); });
 		//@ts-ignore Fix for middle click mouse down triggers scroll on windows
 		this.p5.canvas.addEventListener("mousedown", (e) => { e.preventDefault(); });
+		//@ts-ignore Fix for middle click mouse down triggers scroll on windows
+		// console.log('canvas', canvas)
+		this.p5.canvas.addEventListener("change", (e) => { console.log('test'); e.preventDefault(); });
 		//@ts-ignore Select all onclick on the Output field
 		document.getElementById("Output").setAttribute("onFocus", "this.select();");
+		this.settings.hide();
 	}
 
 	private draw(): void {
@@ -252,6 +266,7 @@ export class imageMapCreator {
 		}
 		this.onClick(e);
 		this.bgLayer.disappear();
+		
 	}
 
 	private mouseWheel(e: MouseWheelEvent): boolean {
@@ -382,6 +397,7 @@ export class imageMapCreator {
 			}
 		}
 		this.selection.clear();
+		this.callBacks.onUpdatedAreas()
 	}
 
 	onOver(evt: MouseEvent): void {
@@ -469,6 +485,7 @@ export class imageMapCreator {
 	setTool(value: Tool): void {
 		this.tool = value;
 		this.tempArea = new AreaEmpty();
+		this.callBacks.onUpdatedAreas()
 	}
 
 	setCursor(): void {
@@ -615,6 +632,8 @@ export class imageMapCreator {
 			undo: () => area = this.map.shiftArea()!,
 			redo: () => this.map.addArea(area, false),
 		});
+		this.callBacks.onAddArea(area)
+		this.callBacks.onUpdatedAreas()
 	}
 
 	/**
@@ -631,6 +650,7 @@ export class imageMapCreator {
 				redo: () => this.map.rmvArea(id),
 			});
 		}
+		this.callBacks.onUpdatedAreas()
 	}
 
 	/**
@@ -643,14 +663,15 @@ export class imageMapCreator {
 				redo: () => this.map.moveArea(area.id, direction),
 			});
 		}
+		this.callBacks.onUpdatedAreas()
 	}
 
 	/**
 	 * Set the url of an area
 	 */
-	setAreaUrl(area: Area): void {
+	setAreaUrl(area: Area,input: string | null): void {
 		let href = area.getHref();
-		let input = prompt("Enter the pointing url of this area", href ? href : "http://");
+		if(!input) input = prompt("Enter the pointing url of this area", href ? href : "http://");
 		if (input) {
 			area.setHref(input);
 			this.undoManager.add({
@@ -658,14 +679,15 @@ export class imageMapCreator {
 				redo: () => area.setHref(input!),
 			});
 		}
+		this.callBacks.onUpdatedAreas()
 	}
 
 	/**
 	 * Set the title of an area
 	 */
-	setAreaTitle(area: Area): void {
+	setAreaTitle(area: Area, input: string | null): void {
 		let title = area.getTitle();
-		let input = prompt("Enter the title of this area", title ? title : "");
+		if(!input) input = prompt("Enter the title of this area", title ? title : "");
 		if (input) {
 			area.setTitle(input);
 			this.undoManager.add({
@@ -673,6 +695,7 @@ export class imageMapCreator {
 				redo: () => area.setTitle(input!),
 			});
 		}
+		this.callBacks.onUpdatedAreas()
 	}
 
 	setDefaultArea(bool: boolean): void {
@@ -687,6 +710,7 @@ export class imageMapCreator {
 				this.settings.setValue("Default Area", bool)
 			}
 		});
+		this.callBacks.onUpdatedAreas()
 	}
 
 	clearAreas(): void {
@@ -696,9 +720,11 @@ export class imageMapCreator {
 			undo: () => this.map.setAreas(areas),
 			redo: () => this.map.clearAreas(),
 		});
+		this.callBacks.onUpdatedAreas()
 	}
 
 	reset(): void {
 		this.undoManager.clear();
+		this.callBacks.onUpdatedAreas()
 	}
 }
