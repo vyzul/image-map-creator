@@ -11,7 +11,7 @@
     "dist": "npm run clean && webpack --env prod",
     "clean": "rm -rf dist",
     "release": "dotenv release-it",
-    "prepare": "npm run dist"
+    "prepare": "npm run clean && webpack --env prod"
   },
   "repository": {
     "type": "git",
