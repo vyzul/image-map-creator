@@ -14,7 +14,8 @@ import QuickSettings from "quicksettings";
 import * as ContextMenu from "../lib/contextmenu/contextmenu";
 import "../lib/contextmenu/contextmenu.css";
 //@ts-ignore strange way to import but it's working
-import p5 = require("p5");
+import p5 from 'p5'
+
 
 export type Tool = "polygon" | "rectangle" | "circle" | "select" | "delete" | "test";
 export type Image = {
@@ -89,6 +90,7 @@ export class imageMapCreator {
 	 * @param {number} height
 	 */
 	constructor(elementId: string, width: number = 600, height: number = 450, callBacks: Callbacks) {
+		console.log('constructor')
 		this.callBacks = callBacks
 		const element = document.getElementById(elementId);
 		if (!element) throw new Error('HTMLElement not found');
@@ -410,6 +412,7 @@ export class imageMapCreator {
 
 	handeFile(file: p5.File): void {
 		if (file.type == "image") {
+			// @ts-ignore
 			this.img.data = this.p5.loadImage(file.data, img => this.resetView(img));
 			this.img.file = file.file;
 			if (!this.map.getName()) {

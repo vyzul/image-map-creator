@@ -4,7 +4,7 @@ import { Area, AreaEmpty } from "./class.area";
 import { Coord } from "./class.coord";
 import { Selection } from "./class.selection";
 import "../lib/contextmenu/contextmenu.css";
-import p5 = require("p5");
+import p5 from 'p5';
 export declare type Tool = "polygon" | "rectangle" | "circle" | "select" | "delete" | "test";
 export declare type Image = {
     data: p5.Image | null;
