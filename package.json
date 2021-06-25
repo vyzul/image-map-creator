@@ -10,8 +10,7 @@
     "build": "webpack --env dev",
     "dist": "npm run clean && webpack --env prod",
     "clean": "rm -rf dist",
-    "release": "dotenv release-it",
-    "prepare": "git submodule init && git submodule update && npm run clean && webpack --env prod"
+    "release": "dotenv release-it"
   },
   "repository": {
     "type": "git",
