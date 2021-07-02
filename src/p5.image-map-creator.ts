@@ -90,7 +90,6 @@ export class imageMapCreator {
 	 * @param {number} height
 	 */
 	constructor(elementId: string, width: number = 600, height: number = 450, callBacks: Callbacks) {
-		console.log('constructor')
 		this.callBacks = callBacks
 		const element = document.getElementById(elementId);
 		if (!element) throw new Error('HTMLElement not found');
