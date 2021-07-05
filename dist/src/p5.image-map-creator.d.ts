@@ -116,7 +116,8 @@ export declare class imageMapCreator {
     onClick(event: MouseEvent): void;
     onOver(evt: MouseEvent): void;
     onLeave(): void;
-    handeFile(file: p5.File): void;
+    handleFile(file: p5.File): void;
+    handleUrl(url: string): void;
     resetView(img: p5.Image): void;
     zoom(coef: number): void;
     drawImage(): void;

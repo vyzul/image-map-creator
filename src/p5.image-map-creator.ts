@@ -148,7 +148,7 @@ export class imageMapCreator {
 
 	private setup(): void {
 		let canvas = this.p5.createCanvas(this.width, this.height);
-		canvas.drop(this.handeFile.bind(this)).dragLeave(this.onLeave.bind(this)).dragOver(this.onOver.bind(this));
+		canvas.drop(this.handleFile.bind(this)).dragLeave(this.onLeave.bind(this)).dragOver(this.onOver.bind(this));
 		//@ts-ignore p5 types does not specify the canvas attribute
 		this.settings = QuickSettings.create(this.p5.width + 5, 0, "Image-map Creator", this.p5.canvas.parentElement)
 			.setDraggable(false)
@@ -409,7 +409,7 @@ export class imageMapCreator {
 		this.bgLayer.disappear();
 	}
 
-	handeFile(file: p5.File): void {
+	handleFile(file: p5.File): void {
 		if (file.type == "image") {
 			// @ts-ignore
 			this.img.data = this.p5.loadImage(file.data, img => this.resetView(img));
@@ -434,6 +434,17 @@ export class imageMapCreator {
 		}
 		this.bgLayer.disappear();
 	}
+	handleUrl(url: string): void {
+		// @ts-ignore
+		this.img.data = this.p5.loadImage(url, img => this.resetView(img));
+		// this.img.file = file.file;
+		// if (!this.map.getName()) {
+		// 	this.map.setName(file.name);
+		// 	this.settings.setValue("Map Name", this.map.getName());
+		// }
+		this.bgLayer.disappear();
+	}
+
 
 	resetView(img: p5.Image): void {
 		this.view.scale = 1;
