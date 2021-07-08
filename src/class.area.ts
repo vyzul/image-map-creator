@@ -272,7 +272,7 @@ export class AreaCircle extends Area {
 		let x = this.coords[0].toStr(0, 'x', scale);
 		let y = this.coords[0].toStr(0, 'y', scale);
 		let r = round(this.radius, 0);
-		return `<circle cx="${x}" cy="${y}" r="${r}" />`;
+		return `<circle cx="${x}" cy="${y}" r="${r}"><title>${this.getTitle()}</title></circle>`;
 	}
 }
 export class AreaPoly extends Area {
@@ -358,7 +358,7 @@ export class AreaPoly extends Area {
 		let points = this.drawingCoords().map(c => {
 			return c.toStr(0, 'x', scale) + ',' + c.toStr(0, 'y', scale);
 		}).join(' ');
-		return `<polygon points="${points}" />`;
+		return `<polygon points="${points}"><title>${this.getTitle()}</title></polygon>`;
 	}
 }
 

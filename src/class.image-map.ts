@@ -129,8 +129,7 @@ export class ImageMap {
 	}
 
 	getNewId(): number {
-		this.lastId++;
-		return this.lastId;
+		return Math.max(...this.areas.map(a=>a.id)) + 1
 	}
 
 	toHtml(scale = 1): string {

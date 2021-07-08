@@ -4,8 +4,8 @@ import { Area, AreaEmpty } from "./class.area";
 import { Coord } from "./class.coord";
 import { Selection } from "./class.selection";
 import "../lib/contextmenu/contextmenu.css";
-import p5 from 'p5';
-export declare type Tool = "polygon" | "rectangle" | "circle" | "select" | "delete" | "test";
+import p5 from "p5";
+export declare type Tool = "polygon" | "rectangle" | "circle" | "select" | "delete" | "test" | "goToLink";
 export declare type Image = {
     data: p5.Image | null;
     file: p5.File | null;
@@ -27,6 +27,7 @@ export declare type Zoom = {
 interface Callbacks {
     onUpdatedAreas: () => void;
     onAddArea: (area: Area) => void;
+    onHoverArea: (area: Area) => void;
 }
 export declare class Save {
     version: string;
