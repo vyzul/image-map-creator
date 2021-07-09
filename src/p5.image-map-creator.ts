@@ -700,6 +700,7 @@ export class imageMapCreator {
 	}
 
 	exportMap(): string {
+		console.log('this.map', this.map)
 		return JSON.stringify(new Save(version, this.map), function (key, value) {
 			if (value instanceof ImageMap && !(this instanceof Save)) {
 				return value.getName();
@@ -709,12 +710,14 @@ export class imageMapCreator {
 	}
 
 	save(): void {
+		console.log('exportMap', this.exportMap())
 		//@ts-ignore encoding options for Chrome
-		// let blob = new Blob([this.exportMap()], {
-		//   encoding: "UTF-8",
-		//   type: "text/plain;charset=UTF-8",
-		// });
-		// download(blob, `${this.map.getName()}.map.json`, "application/json");
+		let blob = new Blob([this.exportMap()], {
+		//@ts-ignore 
+		  encoding: "UTF-8",
+		  type: "text/plain;charset=UTF-8",
+		});
+		download(blob, `${this.map.getName()}.map.json`, "application/json");
 	}
 
 	importMap(json: string): void {
