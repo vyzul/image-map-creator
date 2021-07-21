@@ -440,7 +440,7 @@ export class imageMapCreator {
 
 	onClick(event: MouseEvent): void {
 		if (this.mouseIsHoverSketch()) {
-			console.log("v mouseIsHoverSketch");
+			// console.log("v mouseIsHoverSketch");
 			if (this.hoveredArea) {
 				if (this.p5.mouseButton == this.p5.RIGHT) {
 					this.selection.addArea(this.hoveredArea);
@@ -472,7 +472,7 @@ export class imageMapCreator {
 				}
 			}
 		} else {
-			console.log("mimo mouseIsHoverSketch");
+			// console.log("mimo mouseIsHoverSketch");
 		}
 		this.selection.clear();
 		this.callBacks.onUpdatedAreas();
