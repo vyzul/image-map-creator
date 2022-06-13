@@ -1,7 +1,7 @@
 import { Coord } from "./class.coord";
 import { ImageMap } from "./class.image-map";
 import * as p5 from "p5";
-export declare type Shape = "empty" | "rect" | "circle" | "poly" | "default";
+export declare type Shape = "empty" | "rect" | "circle" | "poly" | "line" | "default";
 export declare abstract class Area {
     protected shape: Shape;
     protected coords: Coord[];
@@ -102,7 +102,7 @@ export declare class AreaPoly extends Area {
      * @param {string} href the link this area is going to point to
      * @param {int} id the unique id
      */
-    constructor(coords?: Coord[], href?: string, title?: string, id?: number, closed?: boolean);
+    constructor(coords?: Coord[], href?: string, title?: string, id?: number, closed?: boolean, shapeName?: Shape);
     isDrawable(): boolean;
     isValidShape(): boolean;
     isOver(coord: Coord): boolean;
@@ -127,6 +127,17 @@ export declare class AreaRect extends AreaPoly {
     isValidShape(): boolean;
     private isNullArea;
     updateLastCoord(coord: Coord): this;
+}
+export declare class AreaLine extends AreaPoly {
+    closed: boolean;
+    /**
+ * @param {Coord[]} coords the list of coordinates
+ * @param {string} href the link this area is going to point to
+ * @param {int} id the unique id
+ */
+    constructor(coords?: Coord[], href?: string, title?: string, id?: number, closed?: boolean);
+    display(p5: p5): void;
+    toPairs(initialArray: Coord[]): Coord[][];
 }
 export declare class AreaDefault extends Area {
     iMap: ImageMap;

@@ -5,7 +5,7 @@ import { Coord } from "./class.coord";
 import { Selection } from "./class.selection";
 import "../lib/contextmenu/contextmenu.css";
 import p5 from "p5";
-export declare type Tool = "polygon" | "rectangle" | "circle" | "select" | "delete" | "test" | "goToLink";
+export declare type Tool = "polygon" | "rectangle" | "circle" | "line" | "select" | "delete" | "test" | "goToLink";
 export declare type Image = {
     data: p5.Image | null;
     file: p5.File | null;
