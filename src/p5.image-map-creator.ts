@@ -1,7 +1,7 @@
 import { version } from "../package.json";
 import { ImageMap } from "./class.image-map";
 import { BgLayer } from "./p5.bg-layer";
-import { Area, AreaCircle, AreaRect, AreaPoly, AreaEmpty } from "./class.area";
+import { Area, AreaCircle, AreaRect, AreaPoly, AreaEmpty, AreaLine } from "./class.area";
 import { Coord } from "./class.coord";
 import { Selection } from "./class.selection";
 import { openWindow } from "./utils";
@@ -20,6 +20,7 @@ export type Tool =
 	| "polygon"
 	| "rectangle"
 	| "circle"
+	| "line"
 	| "select"
 	| "delete"
 	| "test"
@@ -112,7 +113,6 @@ export class imageMapCreator {
 		height: number = 500,
 		callBacks: Callbacks
 	) {
-		console.log('constructor')
 		this.callBacks = callBacks;
 		const element = document.getElementById(elementId);
 		if (!element) throw new Error("HTMLElement not found");
@@ -120,7 +120,7 @@ export class imageMapCreator {
 		this.width = width;
 		this.height = height;
 		this.tool = "polygon";
-		this.drawingTools = ["rectangle", "circle", "polygon"];
+		this.drawingTools = ["rectangle", "circle", "polygon", "line"];
 		this.settings;
 		this.tempArea = new AreaEmpty();
 		this.selection = new Selection();
@@ -269,6 +269,23 @@ export class imageMapCreator {
 							this.tempArea.addCoord(this.mCoord());
 						}
 						break;
+					case "line":
+						let areaLine = this.tempArea as AreaLine;
+						if (areaLine.isEmpty()) {
+							this.setTempArea(coord);
+
+						} else {
+							if(this.tempArea.getCoords().length < 3 ) {
+								this.tempArea.addCoord(this.mCoord());
+							}
+							if(this.tempArea.getCoords().length == 3) {
+								areaLine.close();
+								this.createArea(areaLine);
+								this.tempArea = new AreaEmpty();
+							}
+						}
+						break;
+						
 					case "select":
 						if (this.hoveredPoint !== null) {
 							this.selection.addPoint(this.hoveredPoint);
@@ -688,6 +705,10 @@ export class imageMapCreator {
 				break;
 			case "polygon":
 				this.tempArea = new AreaPoly(coords);
+				this.tempArea.addCoord(coord);
+				break;
+			case "line":
+			this.tempArea = new AreaLine(coords);
 				this.tempArea.addCoord(coord);
 				break;
 		}

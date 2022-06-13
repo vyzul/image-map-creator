@@ -3,7 +3,7 @@ import { Coord } from "./class.coord";
 import { ImageMap } from "./class.image-map";
 import * as p5 from "p5";
 
-export type Shape = "empty" | "rect" | "circle" | "poly" | "default";
+export type Shape = "empty" | "rect" | "circle" | "poly" | "line" | "default"
 
 export abstract class Area {
 
@@ -32,6 +32,9 @@ export abstract class Area {
 			case 'poly':
 				const p = o as AreaPoly
 				return new AreaPoly(p.coords.map(Coord.fromObject), p.href, p.title, p.id, p.closed);
+			case 'line':
+				const l = o as AreaLine
+				return new AreaLine(l.coords.map(Coord.fromObject), l.href, l.title, l.id, l.closed);
 			case 'default':
 				const d = o as AreaDefault
 				return new AreaDefault(d.iMap, d.href, d.title);
@@ -286,9 +289,10 @@ export class AreaPoly extends Area {
 		href: string = "",
 		title: string = "",
 		id: number = 0,
-		public closed = false
+		public closed = false,
+		shapeName: Shape  = "poly"
 	) {
-		super("poly", coords, href, title, id);
+		super(shapeName, coords, href, title, id);
 	}
 
 	isDrawable(): boolean {
@@ -400,6 +404,48 @@ export class AreaRect extends AreaPoly {
 		this.coords[3].y = coord.y;
 		return this;
 	}
+
+}
+export class AreaLine extends AreaPoly {
+		/**
+	 * @param {Coord[]} coords the list of coordinates
+	 * @param {string} href the link this area is going to point to
+	 * @param {int} id the unique id
+	 */
+		 constructor(
+			coords: Coord[] = [],
+			href: string = "",
+			title: string = "",
+			id: number = 0,
+			public closed = false
+		) {
+			super(coords, href, title, id, false, 'line');
+		}
+	
+		display(p5: p5): void {
+			p5.beginShape();
+			const flatten= this.drawingCoords().reduce((result, value) => {
+				result.push(value.x)
+				result.push(value.y)
+				return result
+			  }, [] as number[])
+
+			//@ts-ignore 
+			p5.line(...flatten)
+			p5.endShape();
+		
+		}
+	
+		
+		toPairs(initialArray:Coord[]) {
+			const newArr = initialArray.reduce((result, value, index, array) => {
+			if (index % 2 === 0) {
+				return [...result, array.slice(index, index + 2)];
+				}
+				return result
+			}, [] as Coord[][]);
+			return newArr
+		}
 
 }
 
